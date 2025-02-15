@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_15_092157) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_15_142040) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -90,6 +90,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_15_092157) do
     t.index ["tag_id", "forum_thread_id"], name: "index_forum_threads_tags_on_tag_id_and_forum_thread_id"
   end
 
+  create_table "meetup_attendances", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "event_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_meetup_attendances_on_event_id"
+    t.index ["user_id", "event_id"], name: "index_meetup_attendances_on_user_id_and_event_id", unique: true
+    t.index ["user_id"], name: "index_meetup_attendances_on_user_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.string "title", null: false
     t.text "description"
@@ -138,6 +148,42 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_15_092157) do
     t.index ["user_id"], name: "index_reactions_on_user_id"
   end
 
+  create_table "resource_comments", force: :cascade do |t|
+    t.text "content", null: false
+    t.bigint "user_id", null: false
+    t.bigint "resource_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resource_id"], name: "index_resource_comments_on_resource_id"
+    t.index ["user_id"], name: "index_resource_comments_on_user_id"
+  end
+
+  create_table "resource_tags", force: :cascade do |t|
+    t.bigint "resource_id", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resource_id", "tag_id"], name: "index_resource_tags_on_resource_id_and_tag_id", unique: true
+    t.index ["resource_id"], name: "index_resource_tags_on_resource_id"
+    t.index ["tag_id"], name: "index_resource_tags_on_tag_id"
+  end
+
+  create_table "resources", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.text "content"
+    t.string "resource_type", null: false
+    t.string "url"
+    t.boolean "published", default: false
+    t.boolean "approved", default: false
+    t.integer "view_count", default: 0
+    t.float "rating", default: 0.0
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_resources_on_user_id"
+  end
+
   create_table "tags", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -182,11 +228,18 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_15_092157) do
   add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "forum_threads", "categories"
   add_foreign_key "forum_threads", "users"
+  add_foreign_key "meetup_attendances", "events"
+  add_foreign_key "meetup_attendances", "users"
   add_foreign_key "projects", "users"
   add_foreign_key "quiz_answers", "quiz_questions"
   add_foreign_key "quiz_questions", "quizzes"
   add_foreign_key "reactions", "forum_threads"
   add_foreign_key "reactions", "users"
+  add_foreign_key "resource_comments", "resources"
+  add_foreign_key "resource_comments", "users"
+  add_foreign_key "resource_tags", "resources"
+  add_foreign_key "resource_tags", "tags"
+  add_foreign_key "resources", "users"
   add_foreign_key "user_quiz_responses", "quiz_answers"
   add_foreign_key "user_quiz_responses", "quiz_questions"
   add_foreign_key "user_quiz_responses", "quizzes"

@@ -9,6 +9,22 @@ Rails.application.routes.draw do
         resources :comments, only: [ :create, :destroy ]
       end
 
+      resources :meetups, controller: "events", only: [ :index, :show, :create, :update, :destroy ] do
+        member do
+          post :attend     # Join the meetup
+          delete :attend, action: :cancel_attendance  # Leave the meetup
+        end
+      end
+
+
+      resources :resources, only: [ :index, :show, :create, :update, :destroy ] do
+        member do
+          post :upvote
+          post :downvote
+          get  :comments
+          post :comments, action: :add_comment
+        end
+      end
 
       # Authentication routes
       post "auth/login", to: "auth#login"
@@ -22,8 +38,16 @@ Rails.application.routes.draw do
 
       namespace :api do
         namespace :v1 do
-          # ... other routes ...
           resources :events, only: [ :index, :show, :create, :update, :destroy ]
+        end
+      end
+
+      resources :resources, only: [ :index, :show, :create, :update, :destroy ] do
+        member do
+          post :upvote
+          post :downvote
+          get  :comments         # GET comments for a resource
+          post :comments, action: :add_comment  # Post a new comment
         end
       end
 

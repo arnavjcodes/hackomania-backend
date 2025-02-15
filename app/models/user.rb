@@ -26,7 +26,10 @@ class User < ApplicationRecord
 
   has_many :following, through: :follows_as_follower, source: :followed_user
   has_many :followers, through: :follows_as_followed, source: :follower
+  has_many :resources, dependent: :destroy
 
+  has_many :meetup_attendances, dependent: :destroy
+  has_many :joined_meetups, through: :meetup_attendances, source: :event
 
   def followers_count
     followers.count
