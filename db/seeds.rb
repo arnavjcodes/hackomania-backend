@@ -1,282 +1,166 @@
 # db/seeds.rb
 
-require 'faker'
-
 puts "Clearing existing data..."
-
-# Order is important to respect foreign key constraints
-Reaction.destroy_all
-Comment.destroy_all
-ForumThread.destroy_all
-Project.destroy_all
-Tag.destroy_all
-Category.destroy_all
-Follow.destroy_all
-ClusterAssignment.destroy_all
-UserQuizResponse.destroy_all
-QuizAnswer.destroy_all
-QuizQuestion.destroy_all
-Quiz.destroy_all
-User.destroy_all
-
-puts "Seeding Users..."
-user1 = User.create!(
-  username: "john_doe",
-  name: "John Doe",
-  email: "john@example.com",
-  bio: "I love coding and building communities!",
-  created_at: Faker::Time.backward(days: 30)
-)
-
-user2 = User.create!(
-  username: "jane_smith",
-  name: "Jane Smith",
-  email: "jane@example.com",
-  bio: "Enthusiast of Ruby on Rails!",
-  created_at: Faker::Time.backward(days: 30)
-)
-
-user3 = User.create!(
-  username: "geeky_girl",
-  name: "Alice Wonderland",
-  email: "alice@example.com",
-  bio: "React, Node, and all things JS!",
-  created_at: Faker::Time.backward(days: 15)
-)
+Comment.delete_all
+Reaction.delete_all
+Follow.delete_all
+ForumThread.delete_all
+Tag.delete_all
+Category.delete_all
+User.delete_all
 
 puts "Seeding Categories..."
-cat1 = Category.create!(name: "General", description: "General discussions")
-cat2 = Category.create!(name: "Ruby on Rails", description: "Rails-specific threads")
-cat3 = Category.create!(name: "JavaScript", description: "Talk about JS frameworks and libraries")
+categories = Category.create!([
+  { name: "Programming Languages", description: "Discuss and compare programming languages" },
+  { name: "Web Development", description: "Frontend, backend, and full-stack discussions" },
+  { name: "DevOps & Cloud", description: "Infrastructure, CI/CD, and cloud platforms" },
+  { name: "Data Science & AI", description: "Machine learning, data analysis, and AI" },
+  { name: "Cybersecurity", description: "Security best practices and threat discussions" },
+  { name: "Mobile Development", description: "iOS, Android, and cross-platform development" },
+  { name: "Game Development", description: "Game engines, graphics, and game design" },
+  { name: "Tech Careers", description: "Job advice, interviews, and career growth" }
+])
 
 puts "Seeding Tags..."
-tag1 = Tag.create!(name: "Rails")
-tag2 = Tag.create!(name: "React")
-tag3 = Tag.create!(name: "Beginner")
-tag4 = Tag.create!(name: "Advanced")
+tags = Tag.create!([
+  { name: "python" },
+  { name: "javascript" },
+  { name: "react" },
+  { name: "aws" },
+  { name: "docker" },
+  { name: "machine-learning" },
+  { name: "rust" },
+  { name: "kubernetes" },
+  { name: "typescript" },
+  { name: "graphql" }
+])
 
-puts "Seeding ForumThreads..."
-thread1 = ForumThread.create!(
-  title: "How to get started with Rails?",
-  content: "Any good tutorials or docs for a total beginner?",
-  user: user1,
-  category: cat2,
-  mood: "chill",
-  created_at: Faker::Time.backward(days: 10)
-)
+puts "Seeding Users..."
+# Create tech-savvy users
+users = [
+  { username: "code_wizard", name: "Alice Developer", email: "alice@dev.com", bio: "Full-stack developer with a passion for clean code", language: "en", timezone: "UTC", dark_mode: true },
+  { username: "devops_guru", name: "Bob Ops", email: "bob@ops.com", bio: "Cloud architect and Kubernetes enthusiast", language: "en", timezone: "EST", dark_mode: false },
+  { username: "ai_master", name: "Charlie Data", email: "charlie@ai.com", bio: "Machine learning engineer specializing in NLP", language: "en", timezone: "PST", dark_mode: true },
+  { username: "security_pro", name: "Dana Secure", email: "dana@sec.com", bio: "Cybersecurity consultant and ethical hacker", language: "en", timezone: "CET", dark_mode: true },
+  { username: "game_dev", name: "Eve Creator", email: "eve@game.com", bio: "Unity developer and game designer", language: "en", timezone: "GMT", dark_mode: false },
+  { username: "rustacean", name: "Frank Systems", email: "frank@sys.com", bio: "Low-level programming enthusiast", language: "en", timezone: "UTC", dark_mode: true }
+].map { |attrs| User.create!(attrs) }
 
-thread2 = ForumThread.create!(
-  title: "React vs Vue vs Angular",
-  content: "Which front-end framework do you prefer and why?",
-  user: user2,
-  category: cat3,
-  mood: "excited",
-  created_at: Faker::Time.backward(days: 8)
-)
+puts "Seeding Follows..."
+# Create meaningful follow relationships
+follows = [
+  { follower: users[0], followed_user: users[1] }, # Alice follows Bob
+  { follower: users[1], followed_user: users[2] }, # Bob follows Charlie
+  { follower: users[2], followed_user: users[3] }, # Charlie follows Dana
+  { follower: users[3], followed_user: users[4] }, # Dana follows Eve
+  { follower: users[4], followed_user: users[5] }, # Eve follows Frank
+  { follower: users[5], followed_user: users[0] }  # Frank follows Alice
+].each { |attrs| Follow.create!(attrs) }
 
-thread3 = ForumThread.create!(
-  title: "Best coding practices for 2025",
-  content: "Share your tips and best practices for maintainable code.",
-  user: user3,
-  category: cat1,
-  mood: "curious",
-  created_at: Faker::Time.backward(days: 5)
-)
+puts "Seeding Forum Threads..."
+forum_threads = [
+  {
+    title: "Best practices for React state management in 2024?",
+    content: "With so many options available (Redux, Context API, Zustand, etc.), what's your preferred way to manage state in large React applications?",
+    mood: "Curious",
+    user: users[0],
+    category: categories[1],
+    tags: [ "react", "javascript" ]
+  },
+  {
+    title: "Transitioning from Monolith to Microservices",
+    content: "We're considering breaking our monolith into microservices. What are the key things we should consider before making the jump?",
+    mood: "Supportive",
+    user: users[1],
+    category: categories[2],
+    tags: [ "docker", "kubernetes" ]
+  },
+  {
+    title: "Career advice: Specialist vs Generalist in tech",
+    content: "I'm at a crossroads in my career. Should I go deep into one technology or maintain a broader skill set?",
+    mood: "Curious",
+    user: users[5],
+    category: categories[7],
+    tags: []
+  }
+].map do |attrs|
+  thread = ForumThread.create!(attrs.except(:tags))
+  thread.tags << Tag.where(name: attrs[:tags])
+  thread
+end
 
-puts "Attaching tags to ForumThreads..."
-thread1.tags << tag1  # "Rails"
-thread1.tags << tag3  # "Beginner"
+puts "Seeding Comments..."
+comments = [
+  {
+    content: "I've had great success with Zustand for smaller projects, but for enterprise-level apps, Redux Toolkit is still my go-to.",
+    user: users[1],
+    commentable: forum_threads[0]
+  },
+  {
+    content: "Don't forget about testing! Each microservice should have its own comprehensive test suite.",
+    user: users[2],
+    commentable: forum_threads[1]
+  },
+  {
+    content: "I'd recommend starting as a generalist and then specializing once you find your passion.",
+    user: users[3],
+    commentable: forum_threads[2]
+  }
+].each { |attrs| Comment.create!(attrs) }
 
-thread2.tags << tag2  # "React"
-thread2.tags << tag4  # "Advanced"
+puts "Seeding Reactions..."
+reactions = [
+  { user: users[1], forum_thread: forum_threads[0], reaction_type: "like" },
+  { user: users[2], forum_thread: forum_threads[0], reaction_type: "chill" },
+  { user: users[3], forum_thread: forum_threads[1], reaction_type: "like" }
+].each { |attrs| Reaction.create!(attrs) }
 
-thread3.tags << tag1  # "Rails"
-thread3.tags << tag2  # "React"
-
-puts "Seeding Projects..."
-project1 = Project.create!(
-  title: "Awesome Rails Blog",
-  description: "A sample blog built with Rails 7",
-  repo_link: "https://github.com/john_doe/rails_blog",
-  live_site_link: "https://myrailsblog.example.com",
-  user: user1
-)
-
-project2 = Project.create!(
-  title: "React Photo Gallery",
-  description: "A photo gallery in React using hooks and context",
-  repo_link: "https://github.com/jane_smith/react_gallery",
-  live_site_link: "https://reactgallery.example.com",
-  user: user2
-)
-
-puts "Seeding Comments for ForumThreads and Projects..."
-# Comments on thread1
-c1 = Comment.create!(
-  content: "Rails is awesome. Definitely check out the official docs!",
-  user: user2,
-  commentable: thread1,
-  mood: 1 # thoughtful
-)
-
-c2 = Comment.create!(
-  content: "Yes, freeCodeCamp has a nice tutorial too.",
-  user: user3,
-  commentable: thread1,
-  mood: 3 # helpful
-)
-
-# Nested reply on c1
-Comment.create!(
-  content: "Agree with that, docs are the best place to start!",
-  user: user1,
-  commentable: thread1,
-  parent: c1,
-  mood: 0 # friendly
-)
-
-# Comments on project1
-p_comment1 = Comment.create!(
-  content: "Great project, John! Learned a lot from it.",
-  user: user3,
-  commentable: project1,
-  mood: 4 # insightful
-)
-
-# Comments on thread2
-Comment.create!(
-  content: "I love React because of the community and ecosystem.",
-  user: user1,
-  commentable: thread2,
-  mood: 5 # excited
-)
-
-# Comments on thread3
-Comment.create!(
-  content: "Automated testing and code reviews are key for maintainability!",
-  user: user2,
-  commentable: thread3,
-  mood: 3 # helpful
-)
-
-# Nested reply example
-parent_comment = Comment.create!(
-  content: "Could you share some code style guides?",
-  user: user1,
-  commentable: thread3,
-  mood: 1 # thoughtful
-)
-Comment.create!(
-  content: "Sure! I'll post a link: https://github.com/rubocop/rails-style-guide",
-  user: user2,
-  commentable: thread3,
-  parent: parent_comment,
-  mood: 2 # funny
-)
-
-# Comments on project2
-Comment.create!(
-  content: "Awesome UI, Jane! The lazy loading is smooth.",
-  user: user3,
-  commentable: project2,
-  mood: 5 # excited
-)
-
-puts "Seeding Reactions (like/chill) for some forum threads..."
-Reaction.create!(
-  user: user1,
-  forum_thread: thread2,
-  reaction_type: "like"
-)
-
-Reaction.create!(
-  user: user3,
-  forum_thread: thread2,
-  reaction_type: "chill"
-)
-
-Reaction.create!(
-  user: user2,
-  forum_thread: thread1,
-  reaction_type: "like"
-)
-
-puts "Seeding Follows (users following each other)..."
-Follow.create!(follower_id: user1.id, followed_user_id: user2.id)
-Follow.create!(follower_id: user1.id, followed_user_id: user3.id)
-Follow.create!(follower_id: user2.id, followed_user_id: user3.id)
-
-puts "Seeding ClusterAssignments (example usage)..."
-ClusterAssignment.create!(user: user1, cluster_id: 123, version: 1)
-ClusterAssignment.create!(user: user2, cluster_id: 456, version: 1)
-
-puts "Seeding Quizzes with Questions & Answers..."
-quiz1 = Quiz.create!(
-  title: "Tech Preferences",
-  description: "A quiz to find out your tech stack preference",
+puts "Seeding Quizzes..."
+quiz = Quiz.create!(
+  title: "Tech Personality Quiz",
+  description: "Discover your tech personality type!",
   active: true
 )
 
-q1 = QuizQuestion.create!(
-  quiz: quiz1,
-  content: "Which language do you prefer for backend?",
-  order: 1
-)
+puts "Seeding Quiz Questions..."
+questions = [
+  {
+    content: "When starting a new project, you:",
+    quiz: quiz,
+    order: 1,
+    quiz_answers: [
+      { content: "Dive right into coding", impact: { "hacker": 5 } },
+      { content: "Spend time designing the architecture", impact: { "architect": 5 } },
+      { content: "Write tests first", impact: { "engineer": 5 } },
+      { content: "Research best practices", impact: { "researcher": 5 } }
+    ]
+  },
+  {
+    content: "Your favorite type of tech meetup is:",
+    quiz: quiz,
+    order: 2,
+    quiz_answers: [
+      { content: "Hands-on coding workshops", impact: { "hacker": 5 } },
+      { content: "System design deep dives", impact: { "architect": 5 } },
+      { content: "Case studies of production systems", impact: { "engineer": 5 } },
+      { content: "Emerging tech presentations", impact: { "researcher": 5 } }
+    ]
+  },
+  {
+    content: "When debugging, you:",
+    quiz: quiz,
+    order: 3,
+    quiz_answers: [
+      { content: "Try random fixes until it works", impact: { "hacker": 5 } },
+      { content: "Analyze the system architecture", impact: { "architect": 5 } },
+      { content: "Write tests to reproduce the issue", impact: { "engineer": 5 } },
+      { content: "Research similar issues online", impact: { "researcher": 5 } }
+    ]
+  }
+].each do |question_attrs|
+  answers = question_attrs.delete(:quiz_answers)
+  question = QuizQuestion.create!(question_attrs)
+  answers.each { |answer| question.quiz_answers.create!(answer) }
+end
 
-a1 = QuizAnswer.create!(
-  quiz_question: q1,
-  content: "Ruby",
-  impact: { preference: "Ruby" }
-)
-a2 = QuizAnswer.create!(
-  quiz_question: q1,
-  content: "JavaScript",
-  impact: { preference: "JavaScript" }
-)
-
-q2 = QuizQuestion.create!(
-  quiz: quiz1,
-  content: "How experienced are you with Rails?",
-  order: 2
-)
-a3 = QuizAnswer.create!(
-  quiz_question: q2,
-  content: "Beginner",
-  impact: { level: "beginner" }
-)
-a4 = QuizAnswer.create!(
-  quiz_question: q2,
-  content: "Pro",
-  impact: { level: "pro" }
-)
-
-puts "Seeding UserQuizResponses..."
-UserQuizResponse.create!(
-  user: user1,
-  quiz: quiz1,
-  quiz_question: q1,
-  quiz_answer: a1
-)
-
-UserQuizResponse.create!(
-  user: user1,
-  quiz: quiz1,
-  quiz_question: q2,
-  quiz_answer: a4
-)
-
-UserQuizResponse.create!(
-  user: user2,
-  quiz: quiz1,
-  quiz_question: q1,
-  quiz_answer: a2
-)
-
-UserQuizResponse.create!(
-  user: user2,
-  quiz: quiz1,
-  quiz_question: q2,
-  quiz_answer: a3
-)
-
-puts "Seeding complete!"
+puts "Done seeding!"

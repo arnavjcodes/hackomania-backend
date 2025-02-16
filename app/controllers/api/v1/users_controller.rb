@@ -8,25 +8,26 @@ module Api
         user = params[:id] ? User.find(params[:id]) : User.find(current_user.id)
 
         render json: user.as_json(
-          only: [:id, :name, :username, :email, :bio, :created_a, :preferences],
-          methods: [:followers_count, :following_count],
+          only: [ :id, :name, :username, :email, :bio, :created_a, :preferences ],
+          methods: [ :followers_count, :following_count ],
           include: {
-            forum_threads: { 
-              only: [:id, :title, :content, :created_at],
-              methods: [:likes_count, :chill_votes_count]
+            forum_threads: {
+              only: [ :id, :title, :content, :created_at ],
+              methods: [ :likes_count, :chill_votes_count ]
             },
             comments: {
-              only: [:id, :content, :created_at, :thread_id],
+              only: [ :id, :content, :created_at, :thread_id ],
               include: {
-                forum_thread: { only: [:title] }
+                forum_thread: { only: [ :title ] }
               }
             }
           }
         ).merge(
           is_following: current_user_same?(user) ? nil : current_user.following?(user),
-          comments: user.comments.map { |c| 
-            c.as_json.merge(thread_title: c.forum_thread.title) 
+          comments: user.comments.map { |c|
+            c.as_json.merge(thread_title: (c.commentable_type == "ForumThread" ? c.commentable.try(:title) : nil))
           }
+
         )
       end
 
@@ -35,7 +36,7 @@ module Api
         if @current_user.update(user_params)
           render json: @current_user
         else
-          render json: { errors: @current_user.errors.full_messages }, 
+          render json: { errors: @current_user.errors.full_messages },
                  status: :unprocessable_entity
         end
       end
@@ -61,7 +62,7 @@ module Api
       # POST /api/v1/users/:id/follow
       def follow
         user_to_follow = User.find(params[:id])
-        
+
         if current_user.following << user_to_follow
           render json: { message: "Successfully followed #{user_to_follow.username}" }
         else
@@ -72,14 +73,14 @@ module Api
       # DELETE /api/v1/users/:id/unfollow
       def unfollow
         follow_relationship = current_user.follows_as_follower.find_by(followed_user_id: params[:id])
-        
+
         if follow_relationship&.destroy
           render json: { message: "Successfully unfollowed" }
         else
           render json: { error: "Unable to unfollow user" }, status: :unprocessable_entity
         end
       end
-      
+
 
       private
 
@@ -98,7 +99,7 @@ module Api
           preferences: {
             categories: [],
             tags: [],
-            notifications: [:push]
+            notifications: [ :push ]
           }
         )
       end

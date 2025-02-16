@@ -1,7 +1,7 @@
 class Api::V1::ForumThreadsController < ApplicationController
-  before_action :authenticate_user!, except: [:index]
-  before_action :set_forum_thread, only: [:update, :show, :destroy, :toggle_like, :toggle_chill]
-  
+  before_action :authenticate_user!, except: [ :index ]
+  before_action :set_forum_thread, only: [ :update, :show, :destroy, :toggle_like, :toggle_chill ]
+
   def all_threads
     threads = ForumThread.includes(:user, :category, :reactions).order(created_at: :desc)
 
@@ -11,7 +11,7 @@ class Api::V1::ForumThreadsController < ApplicationController
   def index
     category = Category.find(params[:category_id])
     forum_threads = category.forum_threads.recent.includes(:user, :reactions, :category)
-  
+
     render json: forum_threads.map { |thread| forum_thread_data(thread) }
   end
 
@@ -111,9 +111,9 @@ class Api::V1::ForumThreadsController < ApplicationController
     category = Category.find(thread.category_id)
 
     thread.as_json(
-      include: { 
-        user: { only: [:id, :username, :name] },
-  
+      include: {
+        user: { only: [ :id, :username, :name ] }
+
       }
     ).merge({
       "likes_count" => likes_count,
@@ -121,7 +121,7 @@ class Api::V1::ForumThreadsController < ApplicationController
       "user_liked" => user_liked,
       "user_chilled" => user_chilled,
       "comments_count" => thread.comments.count,
-      "category" => thread.category.as_json(only: [:id, :name, :description]),
+      "category" => thread.category.as_json(only: [ :id, :name, :description ]),
       "mood" => thread.mood,
       "tags" => thread.tags.map { |tag| { id: tag.id, name: tag.name } }
     })
@@ -147,5 +147,4 @@ class Api::V1::ForumThreadsController < ApplicationController
       }
     end
   end
-
 end

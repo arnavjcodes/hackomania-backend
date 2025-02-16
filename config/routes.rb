@@ -5,8 +5,19 @@ Rails.application.routes.draw do
         post "/cluster", to: "clustering#create"
       end
 
-      resources :projects do
+      post "/chat", to: "chat#create"
+
+      get "graph", to: "graphs#show"
+
+      resources :external_events, only: [ :index ]
+
+      resources :projects, only: [ :index, :create, :show, :update, :destroy ] do
         resources :comments, only: [ :create, :destroy ]
+
+        member do
+          post   :add_collaborator      # Expects params[:collaborator_id]
+          delete :remove_collaborator   # Expects params[:collaborator_id]
+        end
       end
 
       resources :meetups, controller: "events", only: [ :index, :show, :create, :update, :destroy ] do
@@ -67,8 +78,7 @@ Rails.application.routes.draw do
 
         # Routes for likes and chill votes
         member do
-          patch :toggle_like
-          patch :toggle_chill
+          patch :toggle_reaction  # Pass reaction_type in params
         end
       end
 

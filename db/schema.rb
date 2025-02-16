@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_15_142040) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_15_223524) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -100,6 +100,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_15_142040) do
     t.index ["user_id"], name: "index_meetup_attendances_on_user_id"
   end
 
+  create_table "project_collaborators", force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_collaborators_on_project_id"
+    t.index ["user_id"], name: "index_project_collaborators_on_user_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.string "title", null: false
     t.text "description"
@@ -108,6 +117,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_15_142040) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "tech_stack"
+    t.string "schema_url"
+    t.string "flowchart_url"
     t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
@@ -230,6 +242,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_15_142040) do
   add_foreign_key "forum_threads", "users"
   add_foreign_key "meetup_attendances", "events"
   add_foreign_key "meetup_attendances", "users"
+  add_foreign_key "project_collaborators", "projects"
+  add_foreign_key "project_collaborators", "users"
   add_foreign_key "projects", "users"
   add_foreign_key "quiz_answers", "quiz_questions"
   add_foreign_key "quiz_questions", "quizzes"

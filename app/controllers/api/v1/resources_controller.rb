@@ -8,7 +8,7 @@ module Api
       # Supports filtering by resource_type, tag, search query, and ordering by rating or views.
       def index
         resources = Resource.includes(:user, :tags)
-                              .published.approved
+                              .published
                               .search(params[:q])
                               .by_type(params[:resource_type])
                               .with_tag(params[:tag])
