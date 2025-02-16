@@ -8,20 +8,14 @@ module Api
         user = params[:id] ? User.find(params[:id]) : User.find(current_user.id)
 
         render json: user.as_json(
-          only: [ :id, :name, :username, :email, :bio, :created_a, :preferences ],
-          methods: [ :followers_count, :following_count ],
-          include: {
-            forum_threads: {
-              only: [ :id, :title, :content, :created_at ],
-              methods: [ :likes_count, :chill_votes_count ]
-            },
-            comments: {
-              only: [ :id, :content, :created_at, :thread_id ],
-              include: {
-                forum_thread: { only: [ :title ] }
-              }
-            }
-          }
+  only: [ :id, :name, :username, :email, :bio, :created_at, :preferences ],
+  methods: [ :followers_count, :following_count ],
+  include: {
+    forum_threads: {
+      only: [ :id, :title, :content, :created_at ],
+      methods: [ :likes_count, :chill_votes_count ]
+    }
+  }
         ).merge(
           is_following: current_user_same?(user) ? nil : current_user.following?(user),
           comments: user.comments.map { |c|
